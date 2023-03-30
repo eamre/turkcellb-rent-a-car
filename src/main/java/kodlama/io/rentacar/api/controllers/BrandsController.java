@@ -1,7 +1,12 @@
 package kodlama.io.rentacar.api.controllers;
 
 import kodlama.io.rentacar.business.abstracts.BrandService;
-import kodlama.io.rentacar.entities.concretes.Brand;
+import kodlama.io.rentacar.business.dto.requests.create.CreateBrandRequest;
+import kodlama.io.rentacar.business.dto.requests.update.UpdateBrandRequest;
+import kodlama.io.rentacar.business.dto.responses.create.CreateBrandResponse;
+import kodlama.io.rentacar.business.dto.responses.update.UpdateBrandResponse;
+import kodlama.io.rentacar.business.dto.responses.get.GetAllBrandsResponse;
+import kodlama.io.rentacar.business.dto.responses.get.GetBrandResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -13,30 +18,31 @@ import java.util.List;
 @AllArgsConstructor
 public class BrandsController {
     private final BrandService brandService;
+
     @GetMapping
-   public List<Brand> getAll(){
+    public List<GetAllBrandsResponse> getAll() {
         return brandService.getAll();
     }
 
     @GetMapping("/{id}")
-   public Brand getById(@PathVariable int id){
+    public GetBrandResponse getById(@PathVariable int id) {
         return brandService.getById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Brand add(@RequestBody Brand brand){
-        return brandService.add(brand);
+    public CreateBrandResponse add(@RequestBody CreateBrandRequest request) {
+        return brandService.add(request);
     }
 
-    @PutMapping ("/{id}")
-   public Brand update(@PathVariable int id,@RequestBody Brand brand){
-        return  brandService.update(id,brand);
+    @PutMapping("/{id}")
+    public UpdateBrandResponse update(@PathVariable int id, @RequestBody UpdateBrandRequest request) {
+        return brandService.update(id, request);
     }
 
-    @DeleteMapping ("/{id}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable int id){
+    public void delete(@PathVariable int id) {
         brandService.delete(id);
     }
 }
