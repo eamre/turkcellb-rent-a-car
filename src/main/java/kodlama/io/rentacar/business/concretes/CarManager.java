@@ -8,6 +8,7 @@ import kodlama.io.rentacar.business.dto.responses.get.GetAllCarsResponse;
 import kodlama.io.rentacar.business.dto.responses.get.GetCarResponse;
 import kodlama.io.rentacar.business.dto.responses.update.UpdateCarResponse;
 import kodlama.io.rentacar.entities.concretes.Car;
+import kodlama.io.rentacar.entities.enums.State;
 import kodlama.io.rentacar.repository.abstracts.CarRepository;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -22,9 +23,12 @@ public class CarManager implements CarService {
     private ModelMapper mapper;
 
     @Override
-    public List<GetAllCarsResponse> getAll() {
+    public List<GetAllCarsResponse> getAll(boolean showMaintance) {
         List<Car> cars = carRepository.findAll();
-        List<GetAllCarsResponse> responses = cars.stream().map(car -> mapper.map(car, GetAllCarsResponse.class)).toList();
+        List<GetAllCarsResponse> responses = cars
+                .stream()
+                .filter(car -> showMaintance || !car.getState().equals(State.MAINTANCE))
+                .map(car -> mapper.map(car, GetAllCarsResponse.class)).toList();
 
         return responses;
     }
@@ -40,6 +44,7 @@ public class CarManager implements CarService {
     @Override
     public CreateCarResponse add(CreateCarRequest request) {
         Car car = mapper.map(request,Car.class);
+        car.setId(0);
         carRepository.save(car);
 
         CreateCarResponse response = mapper.map(car,CreateCarResponse.class);
@@ -53,11 +58,49 @@ public class CarManager implements CarService {
         carRepository.save(car);
 
         UpdateCarResponse response = mapper.map(car,UpdateCarResponse.class);
-        return response;    }
+        return response;
+    }
 
     @Override
     public void delete(int id) {
         carRepository.deleteById(id);
+    }
 
+    public void sendCarToMaintenance(int id) {
+        Car car = carRepository.findById(id).orElseThrow();
+        checkIfCarStateRented(car.getState());
+        checkIfCarStateMaintance(car.getState());
+        car.setState(State.MAINTANCE);
+        car.setId(id);
+        carRepository.save(car);
+    }
+
+    public void carAvailable(int id) {
+        Car car = carRepository.findById(id).orElseThrow();
+        //checkIfCarStateRented(car.getState());
+        checkIfCarStateAvailable(car.getState());
+        car.setState(State.AVAILABLE);
+        car.setId(id);
+        carRepository.save(car);
+    }
+
+
+
+    private void checkIfCarStateRented(State state) {
+        if (state.equals(State.RENTED)) {
+            throw new RuntimeException("Araç kirada bakıma gönderilemez.");
+        }
+    }
+
+    private void checkIfCarStateMaintance(State state) {
+        if (state.equals(State.MAINTANCE)) {
+            throw new RuntimeException("bakımda olan araba bakıma gönderilemez");
+        }
+    }
+
+    private void checkIfCarStateAvailable(State state) {
+        if (state.equals(State.AVAILABLE)) {
+            throw new RuntimeException("Araba kiralanabilir durumda.");
+        }
     }
 }

@@ -4,9 +4,9 @@ import kodlama.io.rentacar.business.abstracts.BrandService;
 import kodlama.io.rentacar.business.dto.requests.create.CreateBrandRequest;
 import kodlama.io.rentacar.business.dto.requests.update.UpdateBrandRequest;
 import kodlama.io.rentacar.business.dto.responses.create.CreateBrandResponse;
-import kodlama.io.rentacar.business.dto.responses.update.UpdateBrandResponse;
 import kodlama.io.rentacar.business.dto.responses.get.GetAllBrandsResponse;
 import kodlama.io.rentacar.business.dto.responses.get.GetBrandResponse;
+import kodlama.io.rentacar.business.dto.responses.update.UpdateBrandResponse;
 import kodlama.io.rentacar.entities.concretes.Brand;
 import kodlama.io.rentacar.repository.abstracts.BrandRepository;
 import lombok.AllArgsConstructor;
@@ -46,9 +46,9 @@ public class BrandManager implements BrandService {
     public CreateBrandResponse add(CreateBrandRequest request) {
         Brand brand = mapper.map(request,Brand.class);
         brand.setId(0);
-        brandRepository.save(brand);
+        Brand createBrand = brandRepository.save(brand);
 
-        CreateBrandResponse response =mapper.map(brand,CreateBrandResponse.class);
+        CreateBrandResponse response =mapper.map(createBrand,CreateBrandResponse.class);
         return response;
 //        Brand brand= new Brand();
 //        brand.setName(request.getName());
@@ -76,8 +76,7 @@ public class BrandManager implements BrandService {
         brandRepository.deleteById(id);
     }
 
-
-
+    //business rules
     private void checkIfBrandExists(int id){
         if (!brandRepository.existsById(id)) throw new RuntimeException("Böyle bir marka mevcut değil.");
     }

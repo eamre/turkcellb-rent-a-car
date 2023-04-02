@@ -20,8 +20,8 @@ public class CarsController {
     private final CarService carService;
 
     @GetMapping
-    public List<GetAllCarsResponse> getAll() {
-        return carService.getAll();
+    public List<GetAllCarsResponse> getAll(@RequestParam(defaultValue = "false") boolean showMaintance) {
+        return carService.getAll(showMaintance);
     }
 
     @GetMapping("/{id}")
@@ -44,6 +44,15 @@ public class CarsController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable int id) {
         carService.delete(id);
+    }
+
+    @PutMapping("/maintance/{id}")
+    public void sendCarToMaintenance(@PathVariable int id){
+        carService.sendCarToMaintenance(id);
+    }
+    @PutMapping("/available/{id}")
+    public void carAvailable(@PathVariable int id){
+        carService.carAvailable(id);
     }
 
 }
