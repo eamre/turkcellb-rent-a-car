@@ -36,8 +36,8 @@ public class MaintenancesController {
     }
 
     @PutMapping("/{id}")
-    public UpdateMaintenanceResponse update(@PathVariable int id, @RequestBody UpdateMaintenanceRequest request/*,@RequestParam(defaultValue = "false") boolean isCompletedMaintenance*/) {
-        return maintenanceService.update(id, request/*,isCompletedMaintenance*/);
+    public UpdateMaintenanceResponse update(@PathVariable int id, @RequestBody UpdateMaintenanceRequest request) {
+        return maintenanceService.update(id, request);
     }
 
     @DeleteMapping("/{id}")

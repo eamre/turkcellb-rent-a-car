@@ -59,16 +59,15 @@ public class MaintenanceManager implements MaintenanceService {
     }
 
     @Override
-    public UpdateMaintenanceResponse update(int id, UpdateMaintenanceRequest request/*,boolean isCompletedMaintenance*/) {
+    public UpdateMaintenanceResponse update(int id, UpdateMaintenanceRequest request) {
         Maintenance maintenance = mapper.map(request,Maintenance.class);
         maintenance.setId(id);
 
-        if (maintenance.getDueDate().before(new Date())) {
-            changeCarStateToAvailable(request.getCarId());
-        }
-        //checkIfCarCanBeSendToMaintenance(request.getCarId());
-        //checkCompletedMaintenance(isCompletedMaintenance, request.getCarId());
+        checkCompletedMaintenance(request);//parametreden gelen boolean durumuna göre state'i available yapıyor
+        //checkDueDate(updateMaintenance); tarihe göre state'i available yapıyor
+
         Maintenance updateMaintenance = repository.save(maintenance);
+
         UpdateMaintenanceResponse response = mapper.map(updateMaintenance,UpdateMaintenanceResponse.class);
         return response;
     }
@@ -89,7 +88,11 @@ public class MaintenanceManager implements MaintenanceService {
         UpdateCarRequest updateCarRequest = mapper.map(carResponse, UpdateCarRequest.class);
         carService.update(carResponse.getId(),updateCarRequest);
     }
-
+    private void checkDueDate(Maintenance updateMaintenance){
+        if (updateMaintenance.getDueDate()!=null && updateMaintenance.getDueDate().before(new Date())) {
+            changeCarStateToAvailable(updateMaintenance.getCar().getId());
+        }
+    }
     private void changeCarStateToAvailable(int carId) {
         GetCarResponse carResponse = carService.getById(carId);
         carResponse.setState(State.AVAILABLE);
@@ -98,11 +101,15 @@ public class MaintenanceManager implements MaintenanceService {
         carService.update(carId, updateCarRequest);
     }
 
-    private void checkCompletedMaintenance(boolean isCompletedMaintenance,int carId){
-        GetCarResponse carResponse = carService.getById(carId);
-        if(isCompletedMaintenance){
+    private void checkCompletedMaintenance(UpdateMaintenanceRequest request){
+        GetCarResponse carResponse = carService.getById(request.getCarId());
+
+        if(request.getDueDate()!=null && request.isCompletedMaintenance()){
             carResponse.setState(State.AVAILABLE);
         }
+        else if(request.getDueDate()==null && request.isCompletedMaintenance())
+            throw new RuntimeException("bitiş tarihini yazınız.");
+
         UpdateCarRequest updateCarRequest = mapper.map(carResponse, UpdateCarRequest.class);
         carService.update(carResponse.getId(),updateCarRequest);
     }

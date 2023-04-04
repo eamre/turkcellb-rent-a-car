@@ -16,5 +16,6 @@ public class UpdateMaintenanceRequest {
     private Date dueDate;
     private double maintenanceCost;
     private String description;
+    private boolean completedMaintenance;
     private int carId;
 }
