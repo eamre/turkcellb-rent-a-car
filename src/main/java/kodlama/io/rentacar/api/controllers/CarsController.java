@@ -46,13 +46,13 @@ public class CarsController {
         carService.delete(id);
     }
 
-    @PutMapping("/maintance/{id}")
-    public void sendCarToMaintenance(@PathVariable int id){
-        carService.sendCarToMaintenance(id);
-    }
-    @PutMapping("/available/{id}")
-    public void carAvailable(@PathVariable int id){
-        carService.carAvailable(id);
-    }
+//    @PutMapping("/maintance/{id}")
+//    public void sendCarToMaintenance(@PathVariable int id){
+//        carService.sendCarToMaintenance(id);
+//    }
+//    @PutMapping("/available/{id}")
+//    public void carAvailable(@PathVariable int id){
+//        carService.carAvailable(id);
+//    }
 
 }

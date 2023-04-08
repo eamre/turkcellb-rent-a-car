@@ -5,15 +5,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateMaintenanceRequest {
-    private Date startDate;
-    private Date dueDate;
+    private LocalDateTime startDate;
+    private LocalDateTime dueDate;
+    private boolean isCompleted;
     private double maintenanceCost;
     private String description;
     private boolean completedMaintenance;

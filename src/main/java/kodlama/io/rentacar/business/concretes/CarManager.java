@@ -27,7 +27,7 @@ public class CarManager implements CarService {
         List<Car> cars = carRepository.findAll();
         List<GetAllCarsResponse> responses = cars
                 .stream()
-                .filter(car -> showMaintance || !car.getState().equals(State.MAINTANCE))
+                .filter(car -> showMaintance || !car.getState().equals(State.MAINTENANCE))
                 .map(car -> mapper.map(car, GetAllCarsResponse.class)).toList();
 
         return responses;
@@ -45,6 +45,8 @@ public class CarManager implements CarService {
     public CreateCarResponse add(CreateCarRequest request) {
         Car car = mapper.map(request,Car.class);
         car.setId(0);
+        car.setState(State.AVAILABLE);
+
         carRepository.save(car);
 
         CreateCarResponse response = mapper.map(car,CreateCarResponse.class);
@@ -53,6 +55,7 @@ public class CarManager implements CarService {
 
     @Override
     public UpdateCarResponse update(int id, UpdateCarRequest request) {
+        checkIfExistsById(id);
         Car car = mapper.map(request,Car.class);
         car.setId(id);
         carRepository.save(car);
@@ -66,25 +69,39 @@ public class CarManager implements CarService {
         carRepository.deleteById(id);
     }
 
-    public void sendCarToMaintenance(int id) {
-        Car car = carRepository.findById(id).orElseThrow();
-        checkIfCarStateRented(car.getState());
-        checkIfCarStateMaintance(car.getState());
-        car.setState(State.MAINTANCE);
-        car.setId(id);
-        carRepository.save(car);
-    }
-
-    public void carAvailable(int id) {
-        Car car = carRepository.findById(id).orElseThrow();
-        //checkIfCarStateRented(car.getState());
-        checkIfCarStateAvailable(car.getState());
-        car.setState(State.AVAILABLE);
-        car.setId(id);
-        carRepository.save(car);
+    @Override
+    public void changeState(int id, State state) {
+       Car car = carRepository.findById(id).orElseThrow();
+       car.setState(state);
+       carRepository.save(car);
     }
 
 
+
+//    public void sendCarToMaintenance(int id) {
+//        Car car = carRepository.findById(id).orElseThrow();
+//        checkIfCarStateRented(car.getState());
+//        checkIfCarStateMaintance(car.getState());
+//        car.setState(State.MAINTANCE);
+//        car.setId(id);
+//        carRepository.save(car);
+//    }
+//
+//    public void carAvailable(int id) {
+//        Car car = carRepository.findById(id).orElseThrow();
+//        //checkIfCarStateRented(car.getState());
+//        checkIfCarStateAvailable(car.getState());
+//        car.setState(State.AVAILABLE);
+//        car.setId(id);
+//        carRepository.save(car);
+//    }
+
+
+    private void checkIfExistsById(int id) {
+        if (!carRepository.existsById(id)) {
+            throw new RuntimeException("Böyle bir araç bulunamadı!");
+        }
+    }
 
     private void checkIfCarStateRented(State state) {
         if (state.equals(State.RENTED)) {
@@ -93,7 +110,7 @@ public class CarManager implements CarService {
     }
 
     private void checkIfCarStateMaintance(State state) {
-        if (state.equals(State.MAINTANCE)) {
+        if (state.equals(State.MAINTENANCE)) {
             throw new RuntimeException("bakımda olan araba bakıma gönderilemez");
         }
     }
