@@ -1,12 +1,15 @@
 package kodlama.io.rentacar.business.concretes;
 
 import kodlama.io.rentacar.business.abstracts.CarService;
+import kodlama.io.rentacar.business.abstracts.InvoiceService;
 import kodlama.io.rentacar.business.abstracts.PaymentService;
 import kodlama.io.rentacar.business.abstracts.RentalService;
+import kodlama.io.rentacar.business.dto.requests.create.CreateInvoiceRequest;
 import kodlama.io.rentacar.business.dto.requests.create.CreateRentalRequest;
 import kodlama.io.rentacar.business.dto.requests.update.UpdateRentalRequest;
 import kodlama.io.rentacar.business.dto.responses.create.CreateRentalResponse;
 import kodlama.io.rentacar.business.dto.responses.get.GetAllRentalResponse;
+import kodlama.io.rentacar.business.dto.responses.get.GetCarResponse;
 import kodlama.io.rentacar.business.dto.responses.get.GetRentalResponse;
 import kodlama.io.rentacar.business.dto.responses.update.UpdateRentalResponse;
 import kodlama.io.rentacar.common.dto.CreateRentalPaymentRequest;
@@ -28,6 +31,7 @@ public class RentalManager implements RentalService {
     private ModelMapper mapper;
     private CarService carService;
     private final PaymentService paymentService;
+    private final InvoiceService invoiceService;
 
     @Override
     public List<GetAllRentalResponse> getAll() {
@@ -61,8 +65,11 @@ public class RentalManager implements RentalService {
         paymentService.processRentalPayment(paymentRequest);
 
         repository.save(rental);
-
         carService.changeState(rental.getCar().getId(), State.RENTED);
+
+        CreateInvoiceRequest invoiceRequest = new CreateInvoiceRequest(); //mapper.map(rental,CreateInvoiceRequest.class);
+        createInvoiceRequest(request,invoiceRequest,rental);
+        invoiceService.add(invoiceRequest);
 
         CreateRentalResponse response = mapper.map(rental,CreateRentalResponse.class) ;
         return response;
@@ -88,6 +95,19 @@ public class RentalManager implements RentalService {
         carService.changeState(carId,State.AVAILABLE);
     }
 
+    private void createInvoiceRequest(CreateRentalRequest rentalRequest, CreateInvoiceRequest invoiceRequest, Rental rental ){
+        GetCarResponse car = carService.getById(rentalRequest.getCarId());
+
+        invoiceRequest.setStartDate(rental.getStartDate());
+        invoiceRequest.setModelName(car.getModelName());
+        invoiceRequest.setBrandName(car.getModelBrandName());
+        invoiceRequest.setDailyPrice(rentalRequest.getDailyPrice());
+        invoiceRequest.setRentedForDays(rentalRequest.getRentedForDays());
+        invoiceRequest.setCardHolder(rentalRequest.getPaymentRequest().getCardHolder());
+        invoiceRequest.setPlate(car.getPlate());
+        invoiceRequest.setModelYear(car.getModelYear());
+
+    }
 
     private double getTotalPrice(Rental rental) {
         return rental.getDailyPrice() * rental.getRentedForDays();
@@ -104,5 +124,6 @@ public class RentalManager implements RentalService {
             throw new RuntimeException("Araç müsait değil!");
         }
     }
+
 
 }

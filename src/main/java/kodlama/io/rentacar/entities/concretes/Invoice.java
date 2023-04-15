@@ -1,5 +1,6 @@
 package kodlama.io.rentacar.entities.concretes;
 
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,20 +15,21 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 
 @Entity
-@Table(name="rentals")
-public class Rental {
+@Table(name="invoices")
+public class Invoice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    private String cardHolder;
+    private String modelName;
+    private String brandName;
+    private String plate;
+    private int modelYear;
     private double dailyPrice;
+    private double totalPrice;
     private int rentedForDays;
-    private double totalPrice; //readonly
     private LocalDateTime startDate;
 
-    @ManyToOne
-    @JoinColumn(name="car_id")
-    private Car car;
-
-//    @OneToOne(mappedBy = "rental")
-//    private Invoice invoice;
+//    @OneToOne
+//    private Rental rental;
 }
