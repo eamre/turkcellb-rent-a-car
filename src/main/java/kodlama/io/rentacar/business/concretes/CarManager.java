@@ -7,6 +7,7 @@ import kodlama.io.rentacar.business.dto.responses.create.CreateCarResponse;
 import kodlama.io.rentacar.business.dto.responses.get.GetAllCarsResponse;
 import kodlama.io.rentacar.business.dto.responses.get.GetCarResponse;
 import kodlama.io.rentacar.business.dto.responses.update.UpdateCarResponse;
+import kodlama.io.rentacar.business.rules.CarBusinessRules;
 import kodlama.io.rentacar.entities.concretes.Car;
 import kodlama.io.rentacar.entities.enums.State;
 import kodlama.io.rentacar.repository.abstracts.CarRepository;
@@ -20,6 +21,7 @@ import java.util.List;
 @Service
 public class CarManager implements CarService {
     private CarRepository carRepository;
+    private CarBusinessRules rules;
     private ModelMapper mapper;
 
     @Override
@@ -55,7 +57,7 @@ public class CarManager implements CarService {
 
     @Override
     public UpdateCarResponse update(int id, UpdateCarRequest request) {
-        checkIfExistsById(id);
+        rules.checkIfExistsById(id);
         Car car = mapper.map(request,Car.class);
         car.setId(id);
         carRepository.save(car);
@@ -97,11 +99,7 @@ public class CarManager implements CarService {
 //    }
 
 
-    private void checkIfExistsById(int id) {
-        if (!carRepository.existsById(id)) {
-            throw new RuntimeException("Böyle bir araç bulunamadı!");
-        }
-    }
+
 
     private void checkIfCarStateRented(State state) {
         if (state.equals(State.RENTED)) {

@@ -7,6 +7,7 @@ import kodlama.io.rentacar.business.dto.responses.create.CreateModelResponse;
 import kodlama.io.rentacar.business.dto.responses.get.GetAllModelsResponse;
 import kodlama.io.rentacar.business.dto.responses.get.GetModelResponse;
 import kodlama.io.rentacar.business.dto.responses.update.UpdateModelResponse;
+import kodlama.io.rentacar.business.rules.ModelBusinessRules;
 import kodlama.io.rentacar.entities.concretes.Model;
 import kodlama.io.rentacar.repository.abstracts.ModelRepository;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,8 @@ import java.util.List;
 public class ModelManager implements ModelService {
     private ModelRepository modelRepository;
     private ModelMapper mapper;
+    private final ModelBusinessRules rules;
+
     @Override
     public List<GetAllModelsResponse> getAll() {
         List<Model> models= modelRepository.findAll();
@@ -30,6 +33,7 @@ public class ModelManager implements ModelService {
 
     @Override
     public GetModelResponse getById(int id) {
+        rules.checkIfModelExists(id);
         Model model = modelRepository.findById(id).orElseThrow();
         GetModelResponse response = mapper.map(model,GetModelResponse.class);
         return response;
@@ -47,7 +51,7 @@ public class ModelManager implements ModelService {
 
     @Override
     public UpdateModelResponse update(int id, UpdateModelRequest request) {
-
+        rules.checkIfModelExists(id);
         Model model = mapper.map(request,Model.class);
         model.setId(id);
         modelRepository.save(model);
@@ -58,7 +62,7 @@ public class ModelManager implements ModelService {
 
     @Override
     public void delete(int id) {
+        rules.checkIfModelExists(id);
         modelRepository.deleteById(id);
-
     }
 }
