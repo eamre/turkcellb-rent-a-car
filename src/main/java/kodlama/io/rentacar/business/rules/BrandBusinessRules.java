@@ -16,7 +16,7 @@ public class BrandBusinessRules {
     }
 
     public void checkIfBrandExistsByName(String name){
-        if (!brandRepository.existsByNameIgnoreCase(name))
+        if (brandRepository.existsByNameIgnoreCase(name))
             throw new BusinessException(Messages.Brand.Exists);
     }
 }

@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class GetInvoiceResponse {
     private int id;
-    private int rentalId;
+//    private int rentalId;
     private String cardHolder;
     private String modelName;
     private String brandName;

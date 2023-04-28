@@ -25,11 +25,11 @@ public class CarManager implements CarService {
     private ModelMapper mapper;
 
     @Override
-    public List<GetAllCarsResponse> getAll(boolean showMaintance) {
+    public List<GetAllCarsResponse> getAll(boolean showMaintenance) {
         List<Car> cars = carRepository.findAll();
         List<GetAllCarsResponse> responses = cars
                 .stream()
-                .filter(car -> showMaintance || !car.getState().equals(State.MAINTENANCE))
+                .filter(car -> showMaintenance || !car.getState().equals(State.MAINTENANCE))
                 .map(car -> mapper.map(car, GetAllCarsResponse.class)).toList();
 
         return responses;

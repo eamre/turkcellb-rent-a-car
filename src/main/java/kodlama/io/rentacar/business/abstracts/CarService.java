@@ -11,7 +11,7 @@ import kodlama.io.rentacar.entities.enums.State;
 import java.util.List;
 
 public interface CarService {
-    List<GetAllCarsResponse> getAll(boolean showMaintance);
+    List<GetAllCarsResponse> getAll(boolean showMaintenance);
     GetCarResponse getById(int id);
     CreateCarResponse add(CreateCarRequest request);
     UpdateCarResponse update(int id, UpdateCarRequest request);

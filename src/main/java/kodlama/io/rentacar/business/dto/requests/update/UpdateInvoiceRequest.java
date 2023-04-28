@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class UpdateInvoiceRequest {
-    private int rentalId;
+//    private int rentalId;
     private String cardHolder;
     private String modelName;
     private String brandName;
