@@ -12,6 +12,8 @@ import kodlama.io.rentacar.entities.concretes.Brand;
 import kodlama.io.rentacar.repository.abstracts.BrandRepository;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,13 +27,13 @@ public class BrandManager implements BrandService {
     private final BrandBusinessRules rules;
 
     @Override
+    @Cacheable(value="brands_list")
     public List<GetAllBrandsResponse> getAll() {
         List<Brand> brands = brandRepository.findAll();
         List<GetAllBrandsResponse> responses = brands.stream()
                 .map(brand ->mapper.map(brand,GetAllBrandsResponse.class)).toList();
         return responses;
 
-       // return brandRepository.findAll();
     }
 
     @Override
@@ -41,10 +43,10 @@ public class BrandManager implements BrandService {
         GetBrandResponse response = mapper.map(brand,GetBrandResponse.class);
 
         return response;
-        //return brandRepository.findById(id).orElseThrow();
     }
 
     @Override
+    @CacheEvict(value = "brand_list", allEntries = true)
     public CreateBrandResponse add(CreateBrandRequest request) {
         rules.checkIfBrandExistsByName(request.getName());
         Brand brand = mapper.map(request,Brand.class);
@@ -53,15 +55,6 @@ public class BrandManager implements BrandService {
 
         CreateBrandResponse response =mapper.map(createBrand,CreateBrandResponse.class);
         return response;
-//        Brand brand= new Brand();
-//        brand.setName(request.getName());
-//        brandRepository.save(brand);
-//
-//        CreateBrandResponse response = new CreateBrandResponse();
-//        response.setId(brand.getId());
-//        response.setName(brand.getName());
-
-//        return response;
     }
 
     @Override
